@@ -123,7 +123,7 @@ if models_loaded:
     identified_food = None
     img = None
 
-    if uploaded_photo is not None:
+        if uploaded_photo is not None:
         img = Image.open(uploaded_photo).convert("RGB")
         st.image(img, caption="Uploaded photo", width=250)
 
@@ -131,7 +131,7 @@ if models_loaded:
         img_array = tf.keras.utils.img_to_array(img_resized)
         img_array = tf.expand_dims(img_array, 0)
 
-                predictions = image_model.predict(img_array, verbose=0)[0]
+        predictions = image_model.predict(img_array, verbose=0)[0]
 
         if np.all(predictions >= 0) and np.isclose(np.sum(predictions), 1.0, atol=1e-3):
             scores = predictions
