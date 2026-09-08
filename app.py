@@ -131,10 +131,16 @@ if models_loaded:
         img_array = tf.keras.utils.img_to_array(img_resized)
         img_array = tf.expand_dims(img_array, 0)
 
-        predictions = image_model.predict(img_array)
-        scores = tf.nn.softmax(predictions[0])
-        identified_food = class_names[np.argmax(scores)]
-        confidence = 100 * np.max(scores)
+        predictions = image_model.predict(img_array, verbose=0)[0]
+
+if np.all(predictions >= 0) and np.isclose(np.sum(predictions), 1.0, atol=1e-3):
+    scores = predictions
+else:
+    scores = tf.nn.softmax(predictions).numpy()
+
+predicted_index = np.argmax(scores)
+identified_food = class_names[predicted_index]
+confidence = float(scores[predicted_index]) * 100
 
         st.success(f"Identified: **{identified_food}** ({confidence:.1f}% confidence)")
 
@@ -146,10 +152,16 @@ if models_loaded:
         st.write(f"Checking freshness directly from the photo (supported for {identified_food})...")
 
         if st.button("Predict freshness from photo"):
-            fresh_predictions = freshness_photo_model.predict(img_array)
-            fresh_scores = tf.nn.softmax(fresh_predictions[0])
-            prediction = freshness_class_names[np.argmax(fresh_scores)]
-            confidence = 100 * np.max(fresh_scores)
+            fresh_predictions = freshness_photo_model.predict(img_array, verbose=0)[0]
+
+if np.all(fresh_predictions >= 0) and np.isclose(np.sum(fresh_predictions), 1.0, atol=1e-3):
+    fresh_scores = fresh_predictions
+else:
+    fresh_scores = tf.nn.softmax(fresh_predictions).numpy()
+
+predicted_index = np.argmax(fresh_scores)
+prediction = freshness_class_names[predicted_index]
+confidence = float(fresh_scores[predicted_index]) * 100
 
             icon, label = STATUS_DISPLAY.get(prediction, ("", prediction))
             st.markdown(f"### {icon} Status: {label}")
