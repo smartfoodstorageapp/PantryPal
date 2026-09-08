@@ -131,16 +131,16 @@ if models_loaded:
         img_array = tf.keras.utils.img_to_array(img_resized)
         img_array = tf.expand_dims(img_array, 0)
 
-        predictions = image_model.predict(img_array, verbose=0)[0]
+                predictions = image_model.predict(img_array, verbose=0)[0]
 
-if np.all(predictions >= 0) and np.isclose(np.sum(predictions), 1.0, atol=1e-3):
-    scores = predictions
-else:
-    scores = tf.nn.softmax(predictions).numpy()
+        if np.all(predictions >= 0) and np.isclose(np.sum(predictions), 1.0, atol=1e-3):
+            scores = predictions
+        else:
+            scores = tf.nn.softmax(predictions).numpy()
 
-predicted_index = np.argmax(scores)
-identified_food = class_names[predicted_index]
-confidence = float(scores[predicted_index]) * 100
+        predicted_index = np.argmax(scores)
+        identified_food = class_names[predicted_index]
+        confidence = float(scores[predicted_index]) * 100
 
         st.success(f"Identified: **{identified_food}** ({confidence:.1f}% confidence)")
 
